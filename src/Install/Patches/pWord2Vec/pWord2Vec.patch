@@ -1,0 +1,39 @@
+--- pWord2Vec.cpp	2021-05-04 11:14:51.000000000 -0400
++++ f2vpWord2Vec.cpp	2021-05-04 11:14:21.000000000 -0400
+@@ -639,6 +639,8 @@
+             _mm_free(stream);
+         }
+     }
++	double now = omp_get_wtime();
++	printf("\nOverall Words Per Second: %.4f\n", word_count_actual / (now - start));
+ }
+ 
+ int ArgPos(char *str, int argc, char **argv) {
+@@ -760,16 +762,17 @@
+         expTable[i] = expTable[i] / (expTable[i] + 1);                    // Precompute f(x) = x / (x + 1)
+     }
+ 
+-	printf("number of threads: %d\n", num_threads);
+-	printf("number of iterations: %d\n", iter);
+-	printf("hidden size: %d\n", hidden_size);
+-	printf("number of negative samples: %d\n", negative);
+-	printf("window size: %d\n", window);
+-	printf("batch size: %d\n", batch_size);
+-	printf("starting learning rate: %.5f\n", alpha);
+-	printf("stream from disk: %d\n", disk);
+-	printf("starting training using file: %s\n\n", train_file);
+-
++	if (debug_mode > 0) {
++		printf("number of threads: %d\n", num_threads);
++		printf("number of iterations: %d\n", iter);
++		printf("hidden size: %d\n", hidden_size);
++		printf("number of negative samples: %d\n", negative);
++		printf("window size: %d\n", window);
++		printf("batch size: %d\n", batch_size);
++		printf("starting learning rate: %.5f\n", alpha);
++		printf("stream from disk: %d\n", disk);
++		printf("starting training using file: %s\n\n", train_file);
++	}
+     Train_SGNS();
+ 
+     saveModel();

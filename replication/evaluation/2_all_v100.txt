@@ -1,0 +1,5 @@
+# Universal parameters
+2
+-size: 128
+-threads: 40
+-debug: 0

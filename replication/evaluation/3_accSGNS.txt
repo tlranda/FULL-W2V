@@ -1,0 +1,3 @@
+# accSGNS: make sure it only uses the skipgram functions
+3
+-cbow: 0

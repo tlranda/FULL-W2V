@@ -1,0 +1,12 @@
+--- install.sh	2021-05-04 11:07:23.000000000 -0400
++++ f2vinstall.sh	2021-05-04 11:08:01.000000000 -0400
+@@ -3,8 +3,7 @@
+ printf "1. clean up workspace\n"
+ ./clean.sh
+ 
+-printf "\n2. install hyperwords for evaluation\n"
+-hg clone -r 56 https://bitbucket.org/omerlevy/hyperwords
++printf "\n2. SKIPPED -- install hyperwords for evaluation\n"
+ 
+ printf "\n3. build pWord2Vec\n"
+ make clean all

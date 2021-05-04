@@ -1,0 +1,134 @@
+--- pSGNScc.cpp	2021-05-04 11:45:44.000000000 -0400
++++ f2vpSGNScc.cpp	2021-05-04 11:59:38.000000000 -0400
+@@ -24,6 +24,7 @@
+ #include <algorithm>
+ #include <omp.h>
+ #include <assert.h>
++#include <sys/time.h>
+ 
+ #ifdef USE_MKL
+ #include "mkl.h"
+@@ -83,6 +84,14 @@
+ real *Wih = NULL, *Woh = NULL, *expTable = NULL;
+ int hashForDot = -1;
+ 
++double rtclock(void) {
++    struct timeval Tp;
++    int stat;
++    stat = gettimeofday (&Tp, NULL);
++    if (stat != 0) printf("Error return from gettimeofday: %d",stat);
++    return(Tp.tv_sec + Tp.tv_usec*1.0e-6);
++}
++
+ void InitUnigramTable() {
+     table = (int *) _mm_malloc(table_size * sizeof(int), 64);
+ 
+@@ -475,6 +484,9 @@
+     ulonglong sgemm1Fl=0, sgemm2Fl=0, sgemm3Fl=0;
+ 
+         double start, end;
++
++    double start_training = rtclock();
++
+     #pragma omp parallel num_threads(num_threads)
+     {
+         int id = omp_get_thread_num();
+@@ -551,7 +563,7 @@
+                 double stime=0, etime=0;
+                 if (id==0)
+                 {
+-                    etime = omp_get_wtime(); 
++                    etime = omp_get_wtime();
+                 }
+                 int numP=0, maxP=0;
+                 bzero (startOfs, (vocab_hash_size+2) * sizeof (int));
+@@ -562,7 +574,7 @@
+                 while (1) {
+                     if (disk) {
+                         w = ReadWordIndex(fin, 1);
+-                        if (feof(fin)) 
++                        if (feof(fin))
+                         {
+                             break;
+                         }
+@@ -580,9 +592,11 @@
+                         real ratio = (sample * train_words) / vocab[w].cn;
+                         real ran = sqrtf(ratio) + ratio;
+                         next_random2 = next_random2 * (ulonglong) 25214903917 + 11;
+-                        if ((ran < (next_random2 & 0xFFFF) / 65536.f) && (w != 0))
++                        if ((ran < (next_random2 & 0xFFFF) / 65536.f) && (w != 0)) {
+                             continue;
++                        }
+                     }
++
+                     sen[sentence_length] = w;
+                     //count words
+                     startOfs[w+2]++;
+@@ -591,7 +605,7 @@
+                 }
+                 if (id==0)
+                 {
+-                    stime = omp_get_wtime(); 
++                    stime = omp_get_wtime();
+                     fileReadTime  += (stime - etime);
+                 }
+                 //create inverse index
+@@ -633,7 +647,7 @@
+ 
+             assert (word_processed[sentence_position] == 0);
+             int target = sen[sentence_position];
+-            if (target == 0) 
++            if (target == 0)
+             {
+                 word_processed [sentence_position] ++;
+                 sentence_position++;
+@@ -687,7 +701,7 @@
+                 {
+                     stime = omp_get_wtime();
+                 }
+-                //Find negative samples 
++                //Find negative samples
+                 for (int k = 0; k < negative; k++) {
+                     next_random = next_random * (ulonglong) 25214903917 + 11;
+                     int sample = table[(next_random >> 16) % table_size];
+@@ -721,7 +735,7 @@
+                         for (int adjOfs=startOfs[curSample]; adjOfs < startOfs[curSample+1]; adjOfs++)
+                         {
+                             if (word_offsets[adjOfs] <= sentence_position) continue;
+-                            if (numWindows == NUM_SHARED_WINDOWS) 
++                            if (numWindows == NUM_SHARED_WINDOWS)
+                             {
+                                 i=offset;
+                                 break;
+@@ -948,14 +962,14 @@
+         }
+         #pragma omp barrier
+ 
+-        if (id == 0)
+-        {
+-            end = omp_get_wtime();
++//         if (id == 0)
++//         {
++//             end = omp_get_wtime();
+ //            printf ("\nword_count_actual %llu, Time %lf sgemm1 %.2lf(%llu/%lf) flops, sgemm2 %.2lf(%llu/%lf) flops, sgemm3 %.2lf(%llu/%lf) flops graphTraversal+icopy1+icopy2 %.2lf(%.2lf+%.2lf+%.2lf) sec, graphConsTime %.2lf sec, fileReadTime %.2lf sec, matrixTime %.2lf oTime %.2lf + %.2lf sec \n", word_count_actual, end-start, sgemm1Fl*1E-9/sgemm1Time, sgemm1Fl, sgemm1Time, sgemm2Fl*1E-9/sgemm2Time, sgemm2Fl, sgemm2Time, sgemm3Fl*1E-9/sgemm3Time, sgemm3Fl, sgemm3Time, memcpyTime, graphTravTime, iTime1, iTime2, graphConsTime, fileReadTime, matrixTime, oTime1, oTime2);
+-            FILE *fpOut = fopen ("pSGNScc_time", "w");
+-            fprintf (fpOut, "Elapsed %.2lf SGDTime %.2lf CreateInM %.2lf CreateOutM %.2lf UpdateMin %.2lf UpdateMout %.2lf Overhead %.2lf\n", end-start, matrixTime, iTime1, iTime2, oTime1, oTime2, memcpyTime-iTime1-iTime2 + fileReadTime + graphConsTime);
+-            fclose (fpOut);
+-        }
++//             FILE *fpOut = fopen ("pSGNScc_time", "w");
++//             fprintf (fpOut, "Elapsed %.2lf SGDTime %.2lf CreateInM %.2lf CreateOutM %.2lf UpdateMin %.2lf UpdateMout %.2lf Overhead %.2lf\n", end-start, matrixTime, iTime1, iTime2, oTime1, oTime2, memcpyTime-iTime1-iTime2 + fileReadTime + graphConsTime);
++//             fclose (fpOut);
++//         }
+ 
+         _mm_free(inputM);
+         _mm_free(inputs);
+@@ -974,6 +988,9 @@
+         _mm_free (startOfs);
+         _mm_free (tmpOfs);
+     }
++    double end_training = rtclock();
++    // double training_time = end_training - start_training;
++    printf("\nOverall Words Per Second: %.4f\n", word_count_actual / (end_training - start_training));
+ }
+ 
+ int ArgPos(char *str, int argc, char **argv) {

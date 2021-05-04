@@ -1,0 +1,59 @@
+--- cuda_kernel.wombat.cu	2021-05-04 12:13:06.000000000 -0400
++++ f2v-cuda_kernel.wombat.cu	2021-05-04 12:21:30.000000000 -0400
+@@ -2,6 +2,14 @@
+ 
+ #include <cuda_fp16.h>
+ 
++/*
++#define GET_MACRO(_1,_2,_3,NAME,...) NAME
++#define __shfl_down(...) GET_MACRO(__VA_ARGS__, __shfl_down3, __shfl_down2)(__VA_ARGS__)
++#define __shfl_down2(a,b) __shfl_down_sync(0xFFFFFFFF, a, b)
++#define __shfl_down3(a,b,c) __shfl_down_sync(0xFFFFFFFF, a, b, c)
++#define __shfl(a,b) __shfl_down_sync(0xFFFFFFFF, a, b)
++*/
++
+ __global__ void Wombat4x8(
+     float *Wb,
+     float *Wa,
+@@ -75,8 +83,8 @@
+     float uB = f * As[row*hidden_size + i];
+ 
+     // update column of B
+-    uB += __shfl_down(uB, 16);
+-    uB += __shfl_down(uB, 8);
++    uB += __shfl_down_sync(0xFFFFFFFF, uB, 16);
++    uB += __shfl_down_sync(0xFFFFFFFF, uB, 8);
+     if (row == 0) {
+       atomicAdd(
+           Wb + (hidden_size * bwords[bwords_index + col]) + i,
+@@ -84,9 +92,9 @@
+     }
+ 
+     // update column of A
+-    uA += __shfl_down(uA, 4, 8);
+-    uA += __shfl_down(uA, 2, 8);
+-    uA += __shfl_down(uA, 1, 8);
++    uA += __shfl_down_sync(0xFFFFFFFF, uA, 4, 8);
++    uA += __shfl_down_sync(0xFFFFFFFF, uA, 2, 8);
++    uA += __shfl_down_sync(0xFFFFFFFF, uA, 1, 8);
+     if (col == 0) {
+       atomicAdd(
+           Wa + (hidden_size * awords[awords_index + row]) + i,
+@@ -134,7 +142,7 @@
+   }
+   #pragma unroll
+   for (int i = 16; i > 0; i /= 2) {
+-    f += __shfl_down(f, i);
++    f += __shfl_down_sync(0xFFFFFFFF, f, i);
+   }
+   if (threadIdx.x == 0) {
+     if (hs == 1) {
+@@ -160,7 +168,7 @@
+     }
+   }
+ 
+-  f = __shfl(f, 0);
++  f = __shfl_sync(0xFFFFFFFF, f, 0);
+ 
+ 
+   // Calculate and apply updates

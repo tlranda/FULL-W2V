@@ -1,0 +1,86 @@
+--- word2vec.cu	2021-05-04 12:37:58.000000000 -0400
++++ f2vword2vec.cu	2021-05-04 13:24:57.000000000 -0400
+@@ -21,9 +21,9 @@
+ #define MAX_STRING 100
+ #define EXP_TABLE_SIZE 1000
+ #define MAX_EXP 6
+-#define MAX_SENTENCE_LENGTH 1000
+ #define MAX_CODE_LENGTH 40
+ 
++#define MAX_SENTENCE_LENGTH 1000
+ #define MAX_SENTENCE 15000
+ #define checkCUDAerr(err) {\
+   cudaError_t cet = err;\
+@@ -44,9 +44,9 @@
+ char train_file[MAX_STRING], output_file[MAX_STRING];
+ char save_vocab_file[MAX_STRING], read_vocab_file[MAX_STRING];
+ struct vocab_word *vocab;
+-int binary = 0, cbow = 1, debug_mode = 2, window = 5, min_count = 5, min_reduce = 1, reuseNeg = 1;
++int binary = 0, cbow = 0, debug_mode = 2, window = 8, min_count = 5, min_reduce = 1, reuseNeg = 0;
+ int *vocab_hash;
+-long long vocab_max_size = 1000, vocab_size = 0, layer1_size = 100;
++long long vocab_max_size = 1000, vocab_size = 0, layer1_size = 128;
+ long long train_words = 0, word_count_actual = 0, iter = 5, file_size = 0, classes = 0;
+ float alpha = 0.025, starting_alpha, sample = 1e-3;
+ float *syn0, *syn1, *syn1neg, *expTable;
+@@ -64,7 +64,7 @@
+ 
+ __device__ float reduceInWarp(float f) {
+   for (int i=warpSize/2; i>0; i/=2) {
+-    f += __shfl_xor(f, i, 32);
++    f += __shfl_xor_sync(f, i, 32);
+   }
+   return f;
+ }
+@@ -782,10 +782,10 @@
+   // use in kernel
+   int total_sent_len, reduSize= 32;
+   int *sen, *sentence_length, *d_sen, *d_sent_len;
+-  sen = (int *)malloc(MAX_SENTENCE * 20 * sizeof(int));
++  sen = (int *)malloc(MAX_SENTENCE * 1000 * sizeof(int));
+   sentence_length = (int *)malloc((MAX_SENTENCE + 1) * sizeof(int));
+ 
+-  checkCUDAerr(cudaMalloc((void **)&d_sen, MAX_SENTENCE * 20 * sizeof(int)));
++  checkCUDAerr(cudaMalloc((void **)&d_sen, MAX_SENTENCE * 1000 * sizeof(int)));
+   checkCUDAerr(cudaMalloc((void **)&d_sent_len, (MAX_SENTENCE + 1) * sizeof(int)));
+ 
+   int *negSample = (int *)malloc(MAX_SENTENCE * negative * sizeof(int));
+@@ -800,6 +800,12 @@
+   FILE *fi = fopen(train_file, "rb");
+   fseek(fi, 0, SEEK_SET);
+ 
++  float sum_total_time = 0.0;
++  cudaEvent_t start_cuda, stop_cuda;
++  cudaEventCreate(&start_cuda);
++  cudaEventCreate(&stop_cuda);
++  cudaEventRecord(start_cuda);
++
+   while (1) {
+     if (word_count - last_word_count > 10000) {
+       word_count_actual += word_count - last_word_count;
+@@ -863,6 +869,7 @@
+       word_count_actual += word_count - last_word_count;
+       local_iter--;
+       if (local_iter == 0) break;
++
+       word_count = 0;
+       last_word_count = 0;
+       for (int i=0; i<MAX_SENTENCE+1; i++)
+@@ -889,8 +896,17 @@
+       sgKernel(d_sen, d_sent_len, d_negSample, alpha, cnt_sentence, reduSize);
+   }
+   cudaDeviceSynchronize();
++
++  cudaEventRecord(stop_cuda);
++  cudaEventSynchronize(stop_cuda);
++  cudaEventElapsedTime(&sum_total_time, start_cuda, stop_cuda);
++
+   checkCUDAerr(cudaMemcpy(syn0, d_syn0, vocab_size * layer1_size * sizeof(float), cudaMemcpyDeviceToHost));
+ 
++  // printf("(CUDA timer) Accumulated Total Time = %f sencods \n", sum_total_time/1000);
++  printf("\nOverall Words Per Second: %.4f\n", word_count_actual / (sum_total_time/1000));
++  printf("Overall Words: %llu\nOverall time: %f\n", word_count_actual, sum_total_time/1000);
++
+   fclose(fi);
+ 
+   // free memory

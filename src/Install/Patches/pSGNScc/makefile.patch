@@ -1,0 +1,31 @@
+1,5c1
+< CXX = icpc
+< CC = icc
+< MPICC = mpiicpc
+< CPPFLAGS = -std=c++11 -qopenmp -O3 -D USE_MKL -mkl=sequential -Wall -xhost
+< CFLAGS = -lm -pthread -O3 -march=native -Wall -funroll-loops -Wno-unused-result
+---
+> include ../../common.inc
+7c3
+< all: pSGNScc pWord2Vec word2vec
+---
+> all: pSGNScc
+8a5
+> # pSGSNcc Compiling Routines
+10,16c7,10
+< 	$(CXX) pSGNScc.cpp -o pSGNScc $(CPPFLAGS)
+< pWord2Vec: pWord2Vec.cpp
+< 	$(CXX) pWord2Vec.cpp -o pWord2Vec $(CPPFLAGS)
+< word2vec : word2vec.c
+< 	$(CC) word2vec.c -o word2vec $(CFLAGS)
+< pWord2Vec_mpi: pWord2Vec_mpi.cpp
+< 	$(MPICC) pWord2Vec_mpi.cpp -o pWord2Vec_mpi $(CPPFLAGS)
+---
+> 	$(CPUCC) pSGNScc.cpp -o pSGNScc -D USE_MKL -mkl=sequential -pthread $(C_FLAGS)
+> gdb_pSGNScc: pSGNScc.cpp
+> 	$(CPUCC) pSGNScc.cpp -o gdb_pSGNScc -D USE_MKL -mkl=sequential -pthread $(C_DEBUG_FLAGS)
+> 
+18c12
+< 	rm -rf pWord2Vec pWord2Vec_mpi 
+---
+> 	rm -rf pSGNScc gdb_pSGNScc

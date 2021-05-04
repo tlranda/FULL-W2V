@@ -1,0 +1,5 @@
+# Define corpus-related arguments for TEXT8
+1
+*-read-vocab: ../data/vocab/text8.vocab
+*-train: ../data/corpus/text8
+-iter: 20

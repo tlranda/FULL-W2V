@@ -1,0 +1,13 @@
+# W2V Outputs
+*.words*
+# Executables and Intermediates
+code/wombat/kernels.o
+# Data
+data/*
+# Analytics not worth storing
+*.csv
+*.ncu-rep
+# Misc
+*.pyc
+.snakemake
+.DS_Store

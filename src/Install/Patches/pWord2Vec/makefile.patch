@@ -1,0 +1,24 @@
+--- makefile	2021-05-04 11:34:38.000000000 -0400
++++ f2vmakefile	2021-05-04 11:34:58.000000000 -0400
+@@ -1,12 +1,13 @@
+-CC = icpc
+-MPICC = mpiicpc
+-CFLAGS = -std=c++11 -qopenmp -O3 -D USE_MKL -mkl=sequential -Wall -xhost
++include ../../common.inc
+ 
+-all: pWord2Vec pWord2Vec_mpi 
++all: pWord2Vec
+ 
++# pWord2Vec Compiling Routines
+ pWord2Vec: pWord2Vec.cpp
+-	$(CC) pWord2Vec.cpp -o pWord2Vec $(CFLAGS)
++	$(CPUCC) pWord2Vec.cpp -o pWord2Vec -D USE_MKL -mkl=sequential $(C_FLAGS)
++gdb_pWord2Vec: pWord2Vec.cpp
++	$(CPUCC) pWord2Vec.cpp -o gdb_pWord2Vec -D USE_MKL -mkl=sequential $(C_DEBUG_FLAGS)
+ pWord2Vec_mpi: pWord2Vec_mpi.cpp
+-	$(MPICC) pWord2Vec_mpi.cpp -o pWord2Vec_mpi $(CFLAGS)
+-clean:
+-	rm -rf pWord2Vec pWord2Vec_mpi 
++	$(MPICC) pWord2Vec_mpi.cpp -o pWord2Vec_mpi -D USE_MKL -mkl=sequential $(C_FLAGS)
++
++

@@ -1,0 +1,40 @@
+#!/bin/bash
+# SELECT SCHEDULER NEEDS
+#PBS -N p100_w2v
+#PBS -l select=1:ncpus=24:mem=125gb:ngpus=1:gpu_model=p100,walltime=72:00:00
+
+#SBATCH --time=1-00:00:00
+#SBATCH -w n01 --exclusive
+#SBATCH --output=titanxp_gpu_1bw_baseline_%j.out
+
+if [ ! -z ${PBS_JOBNAME+x} ]; then
+  # In PPS Queue
+  # Load modules necessary for execution, such as compilers and Python3 environment
+  module load anaconda3/5.1.0-gcc cuda/11.0.2-gcc/8.3.1 intel;
+else if [ ! -z ${SLURM_JOB_NAME+x} ]; then
+  # In SLURM Queue
+  # Load modules necessary for execution, such as compilers and Python3 environment
+  module load cuda/11.2;
+else
+  # Interactive
+  echo "Running interactively";
+fi
+fi
+
+hostname; date;
+
+# EZ DRY MODE (any arg turns into dry run)
+if [[ $# -ge 1 ]]; then
+  DRY='--dry-run';
+else
+  DRY='';
+fi
+
+echo "Start Performance Sweeps";
+./template.pbs FULL-W2V FULL-W2V text8 ${DRY};
+./template.pbs FULL-W2V FULL-W2V 1bw ${DRY};
+date;
+# Remove all executables created above during shutdown
+cd ..;
+make clean;
+

@@ -1,0 +1,63 @@
+--- console.cpp	2021-05-04 12:13:06.000000000 -0400
++++ f2vconsole.cpp	2021-05-04 12:25:01.000000000 -0400
+@@ -71,6 +71,20 @@
+     printf("\t-batch-size <int>\n");
+     printf("\t\tThe batch size used for mini-batch training;\n");
+     printf("\t\tdefault is 11 (i.e., 2 * window + 1)\n");
++    printf("\t-hs <int>\n");
++    printf("\t\tUse hierarchical sampling; default is 0 (off)\n");
++    printf("\t-num-threads <int>\n");
++    printf("\t\tNumber of CPU threads to use; default is %d\n", num_threads);
++    printf("\t-senbs <int>\n");
++    printf("\t\tThe number of sentences in a buffer unit; default is %d\n", sentences_in_buffer);
++    printf("\t-tcbs-per-thread <int>\n");
++    printf("\t\tUnknown; default is %d\n", tcbs_per_thread);
++    printf("\t-items-in-tcb <int>\n");
++    printf("\t\tUnknown; default is %d\n", items_in_tcb);
++    printf("\t-num-phys <int>\n");
++    printf("\t\tUnknown; default is %d\n", num_phys);
++    printf("\t-batches-per-thread <int>\n");
++    printf("\t\tUnknown; default is %d\n", batches_per_thread);
+     printf("\nExamples:\n");
+     printf("./word2vec -train data.txt -output vec.txt\n");
+     printf("\t\t-size 200 -window 5 -sample 1e-4 -negative 5\n");
+@@ -111,8 +125,6 @@
+     iter = atoi(argv[i + 1]);
+   if ((i = ArgPos((char *) "-min-count", argc, argv)) > 0)
+     min_count = atoi(argv[i + 1]);
+-  //if ((i = ArgPos((char *) "-batch-size", argc, argv)) > 0)
+-    //batch_size = atoi(argv[i + 1]);
+   if ((i = ArgPos((char *) "-num-threads", argc, argv)) > 0)
+     num_threads = atoi(argv[i + 1]);
+   if ((i = ArgPos((char *) "-senbs", argc, argv)) > 0)
+@@ -128,17 +140,22 @@
+   if ((i = ArgPos((char *) "-batches-per-thread", argc, argv)) > 0)
+     batches_per_thread  = atoi(argv[i + 1]);
+ 
++  printf("hidden size: %d\n", hidden_size);
++  printf("starting training using file: %s\n", train_file);
++  printf("starting learning rate: %.5f\n", alpha);
++  printf("window size: %d\n", window);
++  printf("sampling rate: %.5f\n", sample);
++  printf("number of negative samples: %d\n", negative);
++  printf("hs: %d\n", hs);
++  printf("number of iterations: %d\n", iter);
++  printf("min count: %d\n", min_count);
+   printf("num threads: %d\n", num_threads);
+-  printf("num physical cores: %d\n", num_phys);
++  printf("# sentences in a buffer: %d\n", sentences_in_buffer);
+   printf("tcbs per thread: %d\n", tcbs_per_thread);
+   printf("items in tcb: %d\n", items_in_tcb);
+-  printf("hs: %d\n", hs);
+-  printf("number of iterations: %d\n", iter);
+-  printf("hidden size: %d\n", hidden_size);
+-  printf("number of negative samples: %d\n", negative);
+-  printf("window size: %d\n", window);
+-  printf("starting learning rate: %.5f\n", alpha);
+-  printf("starting training using file: %s\n\n", train_file);
++  printf("num physical cores: %d\n", num_phys);
++  printf("batch size: %d\n", batch_size);
++  printf("batches per thread: %d\n", batches_per_thread);
+ 
+   return 1;
+ }

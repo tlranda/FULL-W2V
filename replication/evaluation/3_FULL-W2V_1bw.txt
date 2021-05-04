@@ -1,0 +1,6 @@
+# Global all tests
+3
+-streams: 4
+-window: 3
+-msl: 100
+#-msl: 100,500,1000,1500

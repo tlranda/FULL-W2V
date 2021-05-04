@@ -1,0 +1,5 @@
+# Define corpus-related arguments for 1BW
+1
+*-read-vocab: ../data/vocab/1b.vocab
+*-train: ../data/corpus/1b
+-iter: 5
