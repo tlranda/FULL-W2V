@@ -1,6 +1,6 @@
 # Compilers
 GPUCC = nvcc
-CPUCC = icpc #~/tools/intel_installation/bin/icpc #icpc
+CPUCC = icpc
 MPICC = mpiicpc
 CPU_GCC = gcc
 
