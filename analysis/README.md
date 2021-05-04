@@ -5,21 +5,20 @@ evalHyperWords.py: Provides a convenient script to operate the OmerLevy Hyperwor
 
 remerge.py: Recovers original embedding files from .vocab & .npy files
 
-# Custom analyses:
-
+# Counter Analyses:
 
 ## NSIGHT
 ### Setup
 `nsight.sh`: Write the path to your `nv-nsight-cu-cli` on line 12 "NSIGHT\_EXE=<path>".
 
 ### Usage:
-`nsight.sh`: ./nsight.sh <output> <implementation>
-* <output> is the current working directory prefix for the desired .words embedding output.
-* <implementation> is the name of the implementation to profile.
+`nsight.sh`: ./nsight.sh \<output\> \<implementation\>
+* \<output\> is the current working directory prefix for the desired .words embedding output.
+* \<implementation\> is the name of the implementation to profile.
 
 ## NVPROF
 ### Usage:
-`nvprof.sh`: ./nvprof.sh <output> <implementation>
-* <output> is the current working directory prefix for the desired .words embedding output.
-* <implementation> is the name of the implementation to profile.
+`nvprof.sh`: ./nvprof.sh \<output\> \<implementation\>
+* \<output\> is the current working directory prefix for the desired .words embedding output.
+* \<implementation\> is the name of the implementation to profile.
 
