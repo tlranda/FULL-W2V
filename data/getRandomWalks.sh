@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Anchor path to script directory                                              
+anchor=$(dirname $(realpath $0));                                              
+cd $anchor;
+mkdir -p graphs;
+cd graphs;
+
 wget https://www.dropbox.com/s/5sdqv854ioody6i/blog_catalog_random_walks
 wget https://www.dropbox.com/s/omft42jgmun1lan/PPI_random_walks
 wget https://www.dropbox.com/s/bhhb0uk5s8d2ot6/wikipedia_random_walks
