@@ -9,3 +9,4 @@ The Word2Vec parameters are written and stored in `evaluation`, such that `#_qua
 The run and template scripts use corpus, system, and implementation information as qualifiers with respective ranks 1, 2, and 3
 to dynamically add all requirements in these specification files to the runtime arguments used in `sweep.py` for fair and accurate evaluations.
 
+`FULL-text8.sh` provides a simple script for use in the FULL-W2V quickstart.
