@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Anchor path to script directory                                              
+anchor=$(dirname $(realpath $0));                                              
+cd $anchor;
 echo "Fetch the 1 billion word language modeling benchmark"
 
 if [ ! -e 1-billion-word-language-modeling-benchmark-r13output.tar.gz ]; then
@@ -13,8 +16,9 @@ if [ ! -d 1-billion-word-language-modeling-benchmark-r13output ]; then
 fi
 
 echo "Aggregating training text ..."
-cat 1-billion-word-language-modeling-benchmark-r13output/heldout-monolingual.tokenized.shuffled/news.en-00000-of-00100 > 1b
-cat 1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled/* >> 1b
+mkdir -p corpus;
+cat 1-billion-word-language-modeling-benchmark-r13output/heldout-monolingual.tokenized.shuffled/news.en-00000-of-00100 > corpus/1b
+cat 1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled/* >> corpus/1b
 
 echo "clean up ..."
 rm -rf 1-billion-word-language-modeling-benchmark-r13output
