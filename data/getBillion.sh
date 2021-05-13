@@ -17,6 +17,7 @@ fi
 
 echo "Aggregating training text ..."
 mkdir -p corpus;
+mkdir -p vocab;
 cat 1-billion-word-language-modeling-benchmark-r13output/heldout-monolingual.tokenized.shuffled/news.en-00000-of-00100 > corpus/1b
 cat 1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled/* >> corpus/1b
 
