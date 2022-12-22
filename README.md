@@ -45,7 +45,13 @@ limitations under the License.
 
 `replication`: Scripts to aid replicating paper experiments.
 
-`materials`: Slides and recorded talks related to this work.
+## Related Materials:
+
+Slides and recorded talks are not hosted via GitHub, but can be accessed online:
+
+* [Slides from ICS'21](http://tlranda.people.clemson.edu/Assets/FULL-W2V/FULL-W2V-ICS_21.pdf)
+* [Short Recorded Talk ICS'21](http://tlranda.people.clemson.edu/Assets/FULL-W2V/FULL-W2V_short.mp4)
+* [Long Recorded Talk ICS'21](http://tlranda.people.clemson.edu/Assets/FULL-W2V/FULL-W2V_ext.mp4)
 
 ## Copyright:
 
