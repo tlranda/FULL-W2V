@@ -45,6 +45,8 @@ limitations under the License.
 
 `replication`: Scripts to aid replicating paper experiments.
 
+`materials`: Slides and recorded talks related to this work.
+
 ## Copyright:
 
 ICS '21, June 14–17, 2021, Virtual Event, USA
